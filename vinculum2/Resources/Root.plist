@@ -4,13 +4,47 @@
 <dict>
 	<key>items</key>
 	<array>
+			<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+		<dict>
+			<key>icon</key>
+		  <string>twitter.png</string>
+			<key>action</key>
+			<string>followOnTwitter</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>@wvabrinskas</string>
+		</dict>
+			<dict>
+			<key>icon</key>
+		  	<string>yt.png</string>
+			<key>action</key>
+			<string>followOnYoutube</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Bill Builds</string>
+		</dict>
+			<dict>
+			<key>icon</key>
+		  <string>twitch.png</string>
+			<key>action</key>
+			<string>followOnTwitch</string>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>billbuildsyt</string>
+		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Vinculum2 First Page</string>
 		</dict>
 		<dict>
+			<key>cellClass</key>
+			<string>MonitorSwitch</string>
 			<key>cell</key>
 			<string>PSSwitchCell</string>
 			<key>default</key>
@@ -18,12 +52,12 @@
 			<key>defaults</key>
 			<string>com.irepo.vinculum2</string>
 			<key>key</key>
-			<string>AwesomeSwitch1</string>
+			<string>enabled</string>
 			<key>label</key>
-			<string>Awesome Switch 1</string>
+			<string>Enabled</string>
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Vinculum2</string>
+	<string>Vinculum 2</string>
 </dict>
 </plist>
