@@ -1,0 +1,9 @@
+Package: com.irepo.vinculum2
+Name: Vinculum 2
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: William Vabrinskas
+Author: William Vabrinskas
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
