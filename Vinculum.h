@@ -8,3 +8,8 @@
 - (void)registerForMessageName:(id)arg1 target:(id)arg2 selector:(SEL)arg3;
 - (void)runServerOnCurrentThread;
 @end
+
+
+@interface SBDockView: UIView 
+-(UIPanGestureRecognizer *)gesture;
+@end
