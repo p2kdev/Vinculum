@@ -13,7 +13,7 @@ INSTALL_TARGET_PROCESSES = backboardd
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Vinculum2
-Vinculum2_FILES = Tweak.x ConfigurationManager.xm
+Vinculum2_FILES = Tweak.x ConfigurationManager.xm Status.m
 Vinculum2_LDFLAGS += -Llib -Wl,-segalign,4000
 Vinculum2_CFLAGS = -fobjc-arc
 

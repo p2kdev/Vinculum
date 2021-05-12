@@ -1,6 +1,7 @@
 #import "ConfigurationManager.h"
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import "Status.h"
 
 @interface CPDistributedMessagingCenter : NSObject
 + (id)centerNamed:(id)arg1;
@@ -11,5 +12,6 @@
 
 
 @interface SBDockView: UIView 
+@property(nonatomic)CGRect originalFrame;
 -(UIPanGestureRecognizer *)gesture;
 @end
