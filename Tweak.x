@@ -146,6 +146,7 @@ static dispatch_once_t onceToken;
 				self.appLibrary = libraryView;
 				self.appLibrary.alpha = 0.0;
 				self.appLibrary.hidden = YES;
+				
 				UIEdgeInsets original = library.contentScrollView.contentInset;
 				library.contentScrollView.contentInset = UIEdgeInsetsMake(original.top, 
 																																	original.left, 
@@ -153,14 +154,12 @@ static dispatch_once_t onceToken;
 																																	original.right);
 
 				UIEdgeInsets originalTable = library.iconTableViewController.tableView.contentInset;
-
 				library.iconTableViewController.tableView.contentInset = UIEdgeInsetsMake(originalTable.top,
 																																								  originalTable.left, 
 																																									self.dockHeight, 
 																																									originalTable.right);
 			});
-			
-
+		
 			self.autoresizesSubviews = NO;
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 															self.frame.origin.y,
