@@ -27,10 +27,12 @@
 -(double)dockHeight;
 -(unsigned long long)dockEdge;
 -(double)dockListOffset;
+//new
+-(void)close;
 @end
 
 @interface SBHLibraryViewController: UIViewController 
--(id)contentScrollView;
+-(UIScrollView *)contentScrollView;
 @end
 
 @interface SBHIconManager 

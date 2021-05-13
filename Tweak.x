@@ -1,8 +1,23 @@
 #import "Vinculum.h"
 
-%hook SBHIconManager
--(void)setTrailingCustomViewController:(UIViewController*)arg1 {
+%hook SBHIconLibraryTableViewController 
+-(void)tableView:(UITableView *)arg1 didSelectRowAtIndexPath:(id)arg2 {
+  [[NSNotificationCenter defaultCenter] postNotificationName:@"icon_launched" object:nil];
+	%orig;
 }
+
+%end
+
+%hook SBHLibraryViewController 
+-(void)iconTapped:(id)arg1 {
+	if (![arg1 isKindOfClass: %c(SBHLibraryCategoryPodIconView)]) {
+		CGPoint point = CGPointMake(0, self.view.frame.origin.y);
+		[self.contentScrollView setContentOffset: point animated:YES];
+  	[[NSNotificationCenter defaultCenter] postNotificationName:@"icon_launched" object:nil];
+	}
+	%orig;
+}
+
 %end
 
 %hook SBIconController 
@@ -49,16 +64,12 @@
 				}];
 			} else {
 				//bring to bottom 
-				[UIView animateWithDuration:0.3f animations:^(void) {
-					self.frame = self.originalFrame;
-				} completion: ^(BOOL complete) {
-				}];
+				[self close];
 			}
 
 		} else if (recognizer.state == UIGestureRecognizerStateBegan) {
 			
 		} else {
-			//self.center = CGPointMake(self.center.x,location.y);
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 														  location.y,
 															self.originalFrame.size.width,
@@ -67,6 +78,14 @@
 		}
 }
 
+
+%new() 
+-(void)close {
+	[UIView animateWithDuration:0.3f animations:^(void) {
+			self.frame = self.originalFrame;
+		} completion: ^(BOOL complete) {
+	}];
+}
 
 //TODO disable app library to prevent crash
 
@@ -81,6 +100,10 @@
 -(id)initWithDockListView:(id)arg1 forSnapshot:(BOOL)arg2 {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
 		[self addGestureRecognizer: [self gesture]];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+																			selector:@selector(close)
+																			name:@"icon_launched"
+																			object:nil];
 	}
 	SBDockView *orig = %orig;
 	return orig;
@@ -105,14 +128,13 @@
 				self.appLibrary.alpha = 0.0;
 			});
 
-			NSLog(@"height %f", self.backgroundView.frame.origin.y);
-
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 															self.frame.origin.y,
 															self.originalFrame.size.width,
 															self.originalLibraryFrame.size.height);
 															
 			self.backgroundView.autoresizesSubviews = NO;
+			self.clipsToBounds = YES;
 			self.backgroundView.frame = CGRectMake(self.originalBackgroundFrame.origin.x,
 																						 self.backgroundView.frame.origin.y,
 																						 self.originalBackgroundFrame.size.width,

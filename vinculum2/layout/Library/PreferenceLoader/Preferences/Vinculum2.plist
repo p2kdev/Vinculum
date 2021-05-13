@@ -11,11 +11,11 @@
 		<key>detail</key>
 		<string>WVRootListController</string>
 		<key>icon</key>
-		<string>icon.png</string>
+		<string>vinculum.png</string>
 		<key>isController</key>
 		<true/>
 		<key>label</key>
-		<string>Vinculum2</string>
+		<string>Vinculum 2</string>
 	</dict>
 </dict>
 </plist>
