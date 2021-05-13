@@ -1,6 +1,6 @@
 #include "WVRootListController.h"
-
-
+#include <dlfcn.h>
+#include <spawn.h>
 
 @implementation WVRootListController
 
@@ -10,6 +10,13 @@
 	}
 
 	return _specifiers;
+}
+
+-(void)apply {
+
+    pid_t pid;
+    const char* args[] = {"killall", "-9", "backboardd", NULL};
+    posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
 }
 
 @end
@@ -29,7 +36,6 @@
     return self;
 
 }
-
 
 - (void)layoutSubviews {
 	[super layoutSubviews];

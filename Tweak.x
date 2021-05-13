@@ -1,4 +1,5 @@
 #import "Vinculum.h"
+static dispatch_once_t onceToken;
 
 %hook SBHIconLibraryTableViewController 
 -(void)tableView:(UITableView *)arg1 didSelectRowAtIndexPath:(id)arg2 {
@@ -47,6 +48,7 @@
 
 %new() 
 -(void)move:(UIPanGestureRecognizer *)recognizer {
+	self.appLibrary.hidden = NO;
 		CGPoint location = [recognizer locationInView: recognizer.view.superview];
 
     if (recognizer.state == UIGestureRecognizerStateEnded ||
@@ -84,6 +86,7 @@
 	[UIView animateWithDuration:0.3f animations:^(void) {
 			self.frame = self.originalFrame;
 		} completion: ^(BOOL complete) {
+				self.appLibrary.hidden = YES;
 	}];
 }
 
@@ -109,29 +112,50 @@
 	return orig;
 }
 
--(void)layoutSubviews {
-	%orig;
+-(void)setBackgroundView:(UIView *)view {
+	if ([ConfigurationManager.sharedManager isEnabled]) {
+		UIView *orig = view;
+		orig.frame = CGRectMake(orig.frame.origin.x,
+														orig.frame.origin.y,
+														orig.frame.size.width,
+														self.originalLibraryFrame.size.height);
+		%orig(orig);
+	}
 
+	%orig;
+}
+
+-(CGRect)dockListViewFrame {
+	CGRect orig = %orig;
+	return CGRectMake(0, 0, orig.size.width, orig.size.height);
+}
+
+-(void)layoutSubviews {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
 		if (self.frame.origin.y > 0) {
 
-			static dispatch_once_t onceToken;
 			SBIconController *cont = [%c(SBIconController) sharedInstance];
 			SBHLibraryViewController *library = cont.libraryViewController;
 			UIView *libraryView = library.view;
 
 			dispatch_once(&onceToken, ^{
+				%orig;
 				self.originalFrame = self.frame;
 				self.originalBackgroundFrame = self.backgroundView.frame;
 				self.originalLibraryFrame = libraryView.frame;
 				self.appLibrary = libraryView;
 				self.appLibrary.alpha = 0.0;
+				self.appLibrary.hidden = YES;
 			});
+			
 
+			self.autoresizesSubviews = NO;
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 															self.frame.origin.y,
-															self.originalFrame.size.width,
+															self.frame.size.width,
 															self.originalLibraryFrame.size.height);
+
+			self.dockListView.frame = CGRectMake(0, 0, self.dockListView.frame.size.width, self.dockListView.frame.size.height);
 															
 			self.backgroundView.autoresizesSubviews = NO;
 			self.clipsToBounds = YES;
@@ -141,14 +165,16 @@
 																						 self.originalLibraryFrame.size.height);
 			
 			self.appLibrary.frame = CGRectMake(0, 
-																			   0, 
-																			   self.originalFrame.size.width,
-																			   self.originalLibraryFrame.size.height - 100);
+																				 0, 
+																				 self.originalFrame.size.width,
+																				 self.originalLibraryFrame.size.height - 100);
 
 			if (![self.appLibrary isDescendantOfView: self]) {
 				[self addSubview: self.appLibrary];
 			}
 		}
+	} else {
+		%orig;
 	}
 }
 
