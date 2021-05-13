@@ -11,11 +11,12 @@
 @end
 
 
-@interface SBDockView: UIView 
+@interface SBDockView: UIView
 @property(nonatomic)CGRect originalFrame;
 @property(nonatomic)CGRect originalBackgroundFrame;
 @property(nonatomic)CGRect originalLibraryFrame;
 @property(nonatomic, weak) UIView* appLibrary;
+@property(nonatomic) CGPoint touchLocation;
 
 @property (nonatomic,readonly) UIView *dockListView; 
 @property(nonatomic)BOOL open;

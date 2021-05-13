@@ -21,6 +21,7 @@
 %property(nonatomic)CGRect originalBackgroundFrame;
 %property(nonatomic)CGRect originalLibraryFrame;
 %property(nonatomic, strong) UIView* appLibrary;
+
 %new()
 -(UIPanGestureRecognizer *)gesture {
     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(move:)];
@@ -54,6 +55,8 @@
 				}];
 			}
 
+		} else if (recognizer.state == UIGestureRecognizerStateBegan) {
+			
 		} else {
 			//self.center = CGPointMake(self.center.x,location.y);
 			self.frame = CGRectMake(self.originalFrame.origin.x,
@@ -63,6 +66,7 @@
 
 		}
 }
+
 
 //TODO disable app library to prevent crash
 
@@ -104,7 +108,7 @@
 			NSLog(@"height %f", self.backgroundView.frame.origin.y);
 
 			self.frame = CGRectMake(self.originalFrame.origin.x,
-															self.originalFrame.origin.y,
+															self.frame.origin.y,
 															self.originalFrame.size.width,
 															self.originalLibraryFrame.size.height);
 															
