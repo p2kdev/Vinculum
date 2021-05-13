@@ -14,6 +14,8 @@
 @interface SBDockView: UIView 
 @property(nonatomic)CGRect originalFrame;
 @property(nonatomic)CGRect originalBackgroundFrame;
+@property(nonatomic)CGRect originalLibraryFrame;
+
 @property (nonatomic,readonly) UIView *dockListView; 
 @property(nonatomic)BOOL open;
 
@@ -26,6 +28,7 @@
 @end
 
 @interface SBHLibraryViewController: UIViewController 
+-(id)contentScrollView;
 @end
 
 @interface SBHIconManager 
@@ -33,6 +36,7 @@
 @end
 
 @interface SBIconController
+@property (nonatomic,retain) SBHLibraryViewController *storedLibraryController;
 +(SBIconController *)sharedInstance; 
 -(SBHLibraryViewController *)libraryViewController;
 @end

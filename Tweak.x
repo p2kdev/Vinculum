@@ -1,10 +1,25 @@
 #import "Vinculum.h"
-static dispatch_once_t onceToken;
+
+%hook SBHIconManager
+-(void)setTrailingCustomViewController:(UIViewController*)arg1 {
+}
+%end
+
+%hook SBIconController 
+// -(BOOL)isAppLibraryAllowed {
+//     BOOL enabled = [[ConfigurationManager sharedManager] isEnabled];
+
+//     if (enabled) {
+//         return NO;
+//     }
+//     return %orig;
+// }
+%end
 
 %hook SBDockView
 %property(nonatomic)CGRect originalFrame;
 %property(nonatomic)CGRect originalBackgroundFrame;
-%property(nonatomic)BOOL open;
+%property(nonatomic)CGRect originalLibraryFrame;
 %new()
 -(UIPanGestureRecognizer *)gesture {
     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(move:)];
@@ -29,20 +44,16 @@ static dispatch_once_t onceToken;
 																	self.originalFrame.size.width,
 																	self.frame.size.height);
 				} completion: ^(BOOL complete) {
-					self.open = YES;
 				}];
-				self.open = YES;
 			} else {
 				//bring to bottom 
 				[UIView animateWithDuration:0.3f animations:^(void) {
 					self.frame = self.originalFrame;
 				} completion: ^(BOOL complete) {
-					self.open = NO;
 				}];
 			}
 
 		} else {
-			self.open = NO;
 			//self.center = CGPointMake(self.center.x,location.y);
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 														  location.y,
@@ -52,11 +63,14 @@ static dispatch_once_t onceToken;
 		}
 }
 
--(void)setFrame:(CGRect)frame {
-	if (!self.open) {
-		%orig;
-	}
-}
+//TODO disable app library to prevent crash
+
+//figure out how to prevent frame from beign changed
+// -(void)setFrame:(CGRect)frame {
+// 	if (!self.open) {
+// 		%orig;
+// 	}
+// }
 
 -(id)initWithDockListView:(id)arg1 forSnapshot:(BOOL)arg2 {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
@@ -68,36 +82,42 @@ static dispatch_once_t onceToken;
 
 -(void)layoutSubviews {
 	%orig;
-	if (self.frame.origin.y > 0) {
-		dispatch_once (&onceToken, ^{
-			self.originalFrame = self.frame;
-			self.originalBackgroundFrame = self.backgroundView.frame;
-		});
 
-		if ([ConfigurationManager.sharedManager isEnabled]) {
+	if ([ConfigurationManager.sharedManager isEnabled]) {
+		if (self.frame.origin.y > 0) {
+
+			static dispatch_once_t onceToken;
 			SBIconController *cont = [%c(SBIconController) sharedInstance];
 			SBHLibraryViewController *library = cont.libraryViewController;
 			UIView *libraryView = library.view;
 
+			dispatch_once(&onceToken, ^{
+				self.originalFrame = self.frame;
+				self.originalBackgroundFrame = self.backgroundView.frame;
+				self.originalLibraryFrame = libraryView.frame;
+			});
+
+			NSLog(@"height %f", self.backgroundView.frame.origin.y);
+
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 															self.originalFrame.origin.y,
 															self.originalFrame.size.width,
-															libraryView.frame.size.height);
+															self.originalLibraryFrame.size.height);
 															
 			self.backgroundView.autoresizesSubviews = NO;
-			self.backgroundView.frame = CGRectMake( self.originalBackgroundFrame.origin.x,
-																							self.backgroundView.frame.origin.y,
-																							self.originalBackgroundFrame.size.width,
-																							libraryView.frame.size.height);
-
+			self.backgroundView.frame = CGRectMake(self.originalBackgroundFrame.origin.x,
+																						 self.backgroundView.frame.origin.y,
+																						 self.originalBackgroundFrame.size.width,
+																						 self.originalLibraryFrame.size.height);
+			
 			libraryView.frame = CGRectMake(0, 
-																			self.dockHeight + 10, 
+																			0, 
 																			self.originalFrame.size.width,
-																			libraryView.frame.size.height);
+																			self.originalLibraryFrame.size.height - 100);
 
-			[self addSubview: libraryView];
-
-			NSLog(@"dock edge %f", self.dockListOffset);
+			if (![libraryView isDescendantOfView: self]) {
+				[self addSubview: libraryView];
+			}
 		}
 	}
 }
