@@ -20,6 +20,7 @@
 %property(nonatomic)CGRect originalFrame;
 %property(nonatomic)CGRect originalBackgroundFrame;
 %property(nonatomic)CGRect originalLibraryFrame;
+%property(nonatomic, strong) UIView* appLibrary;
 %new()
 -(UIPanGestureRecognizer *)gesture {
     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(move:)];
@@ -65,12 +66,13 @@
 
 //TODO disable app library to prevent crash
 
-//figure out how to prevent frame from beign changed
-// -(void)setFrame:(CGRect)frame {
-// 	if (!self.open) {
-// 		%orig;
-// 	}
-// }
+-(void)setFrame:(CGRect)frame {
+	if ([ConfigurationManager.sharedManager isEnabled]) {
+		self.appLibrary.alpha = ((self.originalFrame.size.height / 2.0f) / frame.origin.y);
+		self.dockListView.alpha = 1 - self.appLibrary.alpha;
+	}
+	%orig;
+}
 
 -(id)initWithDockListView:(id)arg1 forSnapshot:(BOOL)arg2 {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
@@ -95,6 +97,8 @@
 				self.originalFrame = self.frame;
 				self.originalBackgroundFrame = self.backgroundView.frame;
 				self.originalLibraryFrame = libraryView.frame;
+				self.appLibrary = libraryView;
+				self.appLibrary.alpha = 0.0;
 			});
 
 			NSLog(@"height %f", self.backgroundView.frame.origin.y);
@@ -110,13 +114,13 @@
 																						 self.originalBackgroundFrame.size.width,
 																						 self.originalLibraryFrame.size.height);
 			
-			libraryView.frame = CGRectMake(0, 
-																			0, 
-																			self.originalFrame.size.width,
-																			self.originalLibraryFrame.size.height - 100);
+			self.appLibrary.frame = CGRectMake(0, 
+																			   0, 
+																			   self.originalFrame.size.width,
+																			   self.originalLibraryFrame.size.height - 100);
 
-			if (![libraryView isDescendantOfView: self]) {
-				[self addSubview: libraryView];
+			if (![self.appLibrary isDescendantOfView: self]) {
+				[self addSubview: self.appLibrary];
 			}
 		}
 	}
