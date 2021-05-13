@@ -146,6 +146,18 @@ static dispatch_once_t onceToken;
 				self.appLibrary = libraryView;
 				self.appLibrary.alpha = 0.0;
 				self.appLibrary.hidden = YES;
+				UIEdgeInsets original = library.contentScrollView.contentInset;
+				library.contentScrollView.contentInset = UIEdgeInsetsMake(original.top, 
+																																	original.left, 
+																																	self.dockHeight, 
+																																	original.right);
+
+				UIEdgeInsets originalTable = library.iconTableViewController.tableView.contentInset;
+
+				library.iconTableViewController.tableView.contentInset = UIEdgeInsetsMake(originalTable.top,
+																																								  originalTable.left, 
+																																									self.dockHeight, 
+																																									originalTable.right);
 			});
 			
 

@@ -31,7 +31,11 @@
 -(void)close;
 @end
 
+@interface SBHIconLibraryTableViewController: UITableViewController
+@end
+
 @interface SBHLibraryViewController: UIViewController 
+@property (nonatomic,readonly) SBHIconLibraryTableViewController *iconTableViewController; 
 -(UIScrollView *)contentScrollView;
 @end
 
