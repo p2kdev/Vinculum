@@ -19,7 +19,6 @@
 @property(nonatomic) CGPoint touchLocation;
 
 @property (nonatomic,readonly) UIView *dockListView; 
-@property(nonatomic)BOOL open;
 
 -(UIPanGestureRecognizer *)gesture;
 -(void)setBackgroundView:(UIView *)arg1 ;
@@ -29,6 +28,7 @@
 -(double)dockListOffset;
 //new
 -(void)close;
+-(void)open;
 @end
 
 @interface SBRootFolderController: NSObject
@@ -41,8 +41,12 @@
 @interface SBHIconLibraryTableViewController: UITableViewController
 @end
 
+@interface SBHLibrarySearchController: UIViewController 
+@end
+
 @interface SBHLibraryViewController: SBNestingViewController 
 @property (nonatomic,readonly) SBHIconLibraryTableViewController *iconTableViewController; 
+-(SBHLibrarySearchController *)containerViewController;
 -(UIScrollView *)contentScrollView;
 -(void)addObserver:(id)arg1 ;
 @end

@@ -5,7 +5,7 @@ include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = Vinculum2
 
-Vinculum2_FILES = WVRootListController.m
+Vinculum2_FILES = WVVinculumRootListController.m
 Vinculum2_FRAMEWORKS = UIKit
 Vinculum2_PRIVATE_FRAMEWORKS = Preferences
 Vinculum2_INSTALL_PATH = /Library/PreferenceBundles

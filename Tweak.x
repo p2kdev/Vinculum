@@ -9,6 +9,18 @@ static dispatch_once_t onceToken;
 
 %end
 
+%hook SBUIController
+-(void)restoreContentAndUnscatterIconsAnimated:(BOOL)arg1 {
+		NSLog(@"block before");
+
+    // void (^newBlock)(void) = ^{
+		// 	NSLog(@"block");
+		// 	arg2();
+    // };
+		%orig;
+}
+%end
+
 %hook SBIconController 
 -(void)iconManager:(id)arg1 rootFolderController:(id)arg2 didOverscrollOnLastPageByAmount:(double)arg3 {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
@@ -71,41 +83,53 @@ static dispatch_once_t onceToken;
 -(void)move:(UIPanGestureRecognizer *)recognizer {
 	self.appLibrary.hidden = NO;
 		CGPoint location = [recognizer locationInView: recognizer.view.superview];
+		CGPoint velocity = [recognizer velocityInView: recognizer.view.superview];
 
     if (recognizer.state == UIGestureRecognizerStateEnded ||
         recognizer.state == UIGestureRecognizerStateCancelled ||
         recognizer.state == UIGestureRecognizerStateFailed) {
-
-			if (location.y < [UIScreen mainScreen].bounds.size.height / 2 ) {
-				//bring to top
-				[UIView animateWithDuration:0.3f animations:^(void) {
-					self.frame = CGRectMake(self.originalFrame.origin.x,
-																	self.originalFrame.size.height / 2,
-																	self.originalFrame.size.width,
-																	self.frame.size.height);
-				} completion: ^(BOOL complete) {
-				}];
-			} else {
-				//bring to bottom 
+	
+			if (velocity.y > 100) {
+				//down
 				[self close];
+			} else if (velocity.y < -100) {
+				//up
+				[self open];
+			} else {
+
+				if (location.y < [UIScreen mainScreen].bounds.size.height / 2 ) {
+					//bring to top
+					[self open];
+				} else {
+				//bring to bottom 
+					[self close];
+				}
 			}
 
 		} else if (recognizer.state == UIGestureRecognizerStateBegan) {
 			
 		} else {
+
 			self.frame = CGRectMake(self.originalFrame.origin.x,
 														  location.y,
 															self.originalFrame.size.width,
 															self.frame.size.height);
-			[self.appLibrary endEditing: YES];
 		}
 }
 
+%new() 
+-(void)open {
+	[UIView animateWithDuration:0.3f animations:^(void) {
+		self.frame = CGRectMake(self.originalFrame.origin.x,
+														self.originalFrame.size.height / 2,
+														self.originalFrame.size.width,
+														self.frame.size.height);
+	} completion: ^(BOOL complete) {
+	}];
+}
 
 %new() 
 -(void)close {
-	[self.appLibrary endEditing: YES];
-
 	[UIView animateWithDuration:0.3f animations:^(void) {
 			self.frame = self.originalFrame;
 		} completion: ^(BOOL complete) {
@@ -113,12 +137,11 @@ static dispatch_once_t onceToken;
 	}];
 }
 
-//TODO disable app library to prevent crash
-
 -(void)setFrame:(CGRect)frame {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
 		self.appLibrary.alpha = ((self.originalFrame.size.height / 2.0f) / frame.origin.y);
 		self.dockListView.alpha = 1 - self.appLibrary.alpha;
+		[self.appLibrary endEditing: YES];
 	}
 	%orig;
 }
@@ -143,18 +166,15 @@ static dispatch_once_t onceToken;
 														orig.frame.size.width,
 														self.originalLibraryFrame.size.height);
 		%orig(orig);
+		return;
 	}
 
 	%orig;
 }
 
--(CGRect)dockListViewFrame {
-	CGRect orig = %orig;
-	return CGRectMake(0, 0, orig.size.width, orig.size.height);
-}
-
 -(void)layoutSubviews {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
+		
 		if (self.frame.origin.y > 0) {
 
 			SBIconController *cont = [%c(SBIconController) sharedInstance];
@@ -163,7 +183,6 @@ static dispatch_once_t onceToken;
 
 			dispatch_once(&onceToken, ^{
 				%orig;
-
 				self.originalFrame = self.frame;
 				self.originalBackgroundFrame = self.backgroundView.frame;
 				self.originalLibraryFrame = libraryView.frame;
@@ -223,5 +242,4 @@ static dispatch_once_t onceToken;
 		NSMutableDictionary *tempDict = [[NSMutableDictionary alloc] initWithDictionary:@{ @"enabled" : [NSNumber numberWithBool:YES] }];
 		[tempDict writeToFile:@"/var/mobile/Library/Preferences/com.irepo.slock.plist" atomically:YES];
 	}
-	
 }

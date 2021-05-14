@@ -1,8 +1,8 @@
-#include "WVRootListController.h"
+#include "WVVinculumRootListController.h"
 #include <dlfcn.h>
 #include <spawn.h>
 
-@implementation WVRootListController
+@implementation WVVinculumRootListController
 
 - (NSArray *)specifiers {
 	if (!_specifiers) {
@@ -22,7 +22,7 @@
 @end
 
 
-@implementation ImageCell
+@implementation ImageCellVinculum
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 
