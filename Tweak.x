@@ -11,13 +11,19 @@ static dispatch_once_t onceToken;
 
 %hook SBIconController 
 -(void)iconManager:(id)arg1 rootFolderController:(id)arg2 didOverscrollOnLastPageByAmount:(double)arg3 {
-	self.homeScreenOverlayController = nil;
+	if ([ConfigurationManager.sharedManager isEnabled]) {
+		self.homeScreenOverlayController = nil;
+	} else {
+		%orig;
+	}
 }
-// -(void)setHomeScreenOverlayController:(SBHomeScreenOverlayController *)arg1 {
-// 	NSLog(@"home %@", arg1);
-// 	%orig(nil);
-// }
 
+-(BOOL)isAppLibrarySupported {
+	if ([ConfigurationManager.sharedManager isEnabled]) {
+		return YES;
+	}
+	return %orig;
+}
 %end
 
 //prevents embedding of the SBHLibaryViewController 
@@ -91,17 +97,19 @@ static dispatch_once_t onceToken;
 														  location.y,
 															self.originalFrame.size.width,
 															self.frame.size.height);
-
+			[self.appLibrary endEditing: YES];
 		}
 }
 
 
 %new() 
 -(void)close {
+	[self.appLibrary endEditing: YES];
+
 	[UIView animateWithDuration:0.3f animations:^(void) {
 			self.frame = self.originalFrame;
 		} completion: ^(BOOL complete) {
-				self.appLibrary.hidden = YES;
+			self.appLibrary.hidden = YES;
 	}];
 }
 
