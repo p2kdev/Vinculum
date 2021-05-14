@@ -18,13 +18,13 @@ rm -rf ./bin/tmp
 mkdir ./bin/tmp
 
 #Version, only used to name the package
-VERSION="2.0.0"
+VERSION="2.0.1"
 
 #Name for tweak
 NAME="Vinculum2"
 
 # Pref name for tweak
-PREF_NAME="vinculum2"
+PREF_NAME="Vinculum2"
 
 # Archs for logging print. 
 ARCHS="arm64 arm64e"

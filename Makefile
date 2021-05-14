@@ -18,5 +18,5 @@ Vinculum2_LDFLAGS += -Llib -Wl,-segalign,4000
 Vinculum2_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
-SUBPROJECTS += vinculum2
+SUBPROJECTS += Vinculum2
 include $(THEOS_MAKE_PATH)/aggregate.mk
