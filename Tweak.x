@@ -107,7 +107,7 @@ static dispatch_once_t onceToken;
 			}
 
 		} else if (recognizer.state == UIGestureRecognizerStateBegan) {
-			
+			//begin swipe. Not used yet. 
 		} else {
 
 			self.frame = CGRectMake(self.originalFrame.origin.x,
