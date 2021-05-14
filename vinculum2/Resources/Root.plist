@@ -73,6 +73,24 @@
 			<string>PSGroupCell</string>
 		</dict>
 		<dict>
+			<key>cellClass</key>
+			<string>MonitorVinculumSwitch</string>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.irepo.vinculum2</string>
+			<key>key</key>
+			<string>showSearchFirst</string>
+			<key>label</key>
+			<string>Show Search First</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+		<dict>
 			<key>action</key>
 			<string>apply</string>
 			<key>cell</key>

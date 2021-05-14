@@ -2,6 +2,16 @@
 #include <dlfcn.h>
 #include <spawn.h>
 
+@implementation MonitorVinculumSwitch
+- (void)controlChanged:(UISwitch *)arg1 {
+  [super controlChanged:arg1];
+
+  CPDistributedMessagingCenter *messagingCenter;
+  messagingCenter = [NSClassFromString(@"CPDistributedMessagingCenter") centerNamed:@"com.irepo.vinculum2.preferences.updated"];
+  [messagingCenter sendMessageName:@"PreferencesDidChangeNotification" userInfo:@{@"value":[NSNumber numberWithBool:arg1.isOn], @"name": self._contentString}];
+}
+@end
+
 @implementation WVVinculumRootListController
 
 - (NSArray *)specifiers {

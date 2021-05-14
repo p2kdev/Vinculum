@@ -42,6 +42,8 @@
 @end
 
 @interface SBHLibrarySearchController: UIViewController 
+-(void)_performPresentation:(BOOL)arg1 ;
+-(void)_dismissPresentation:(BOOL)arg1 ;
 @end
 
 @interface SBHLibraryViewController: SBNestingViewController 

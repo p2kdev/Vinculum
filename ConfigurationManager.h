@@ -10,4 +10,5 @@
 +(ConfigurationManager *)sharedManager;
 -(void)saveWithKey:(NSString *)key value:(id)value;
 -(BOOL)isEnabled;
+-(BOOL)showSearchFirst;
 @end

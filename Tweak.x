@@ -82,39 +82,39 @@ static dispatch_once_t onceToken;
 %new() 
 -(void)move:(UIPanGestureRecognizer *)recognizer {
 	self.appLibrary.hidden = NO;
-		CGPoint location = [recognizer locationInView: recognizer.view.superview];
-		CGPoint velocity = [recognizer velocityInView: recognizer.view.superview];
+	CGPoint location = [recognizer locationInView: recognizer.view.superview];
+	CGPoint velocity = [recognizer velocityInView: recognizer.view.superview];
 
-    if (recognizer.state == UIGestureRecognizerStateEnded ||
-        recognizer.state == UIGestureRecognizerStateCancelled ||
-        recognizer.state == UIGestureRecognizerStateFailed) {
-	
-			if (velocity.y > 100) {
-				//down
-				[self close];
-			} else if (velocity.y < -100) {
-				//up
-				[self open];
-			} else {
+	if (recognizer.state == UIGestureRecognizerStateEnded ||
+			recognizer.state == UIGestureRecognizerStateCancelled ||
+			recognizer.state == UIGestureRecognizerStateFailed) {
 
-				if (location.y < [UIScreen mainScreen].bounds.size.height / 2 ) {
-					//bring to top
-					[self open];
-				} else {
-				//bring to bottom 
-					[self close];
-				}
-			}
-
-		} else if (recognizer.state == UIGestureRecognizerStateBegan) {
-			//begin swipe. Not used yet. 
+		if (velocity.y > 100) {
+			//down
+			[self close];
+		} else if (velocity.y < -100) {
+			//up
+			[self open];
 		} else {
 
-			self.frame = CGRectMake(self.originalFrame.origin.x,
-														  location.y,
-															self.originalFrame.size.width,
-															self.frame.size.height);
+			if (location.y < [UIScreen mainScreen].bounds.size.height / 2 ) {
+				//bring to top
+				[self open];
+			} else {
+			//bring to bottom 
+				[self close];
+			}
 		}
+
+	} else if (recognizer.state == UIGestureRecognizerStateBegan) {
+		//begin swipe. Not used yet. 
+	} else {
+
+		self.frame = CGRectMake(self.originalFrame.origin.x,
+														location.y,
+														self.originalFrame.size.width,
+														self.frame.size.height);
+	}
 }
 
 %new() 
@@ -125,6 +125,7 @@ static dispatch_once_t onceToken;
 														self.originalFrame.size.width,
 														self.frame.size.height);
 	} completion: ^(BOOL complete) {
+		
 	}];
 }
 
@@ -153,9 +154,43 @@ static dispatch_once_t onceToken;
 																			selector:@selector(close)
 																			name:@"icon_launched"
 																			object:nil];
+
+		static dispatch_once_t oncePrefToken;
+
+    dispatch_once (&oncePrefToken, ^{
+        CPDistributedMessagingCenter *messagingCenter;
+
+        messagingCenter = [%c(CPDistributedMessagingCenter) centerNamed:@"com.irepo.vinculum2.preferences.updated"];
+        [messagingCenter runServerOnCurrentThread];
+        [messagingCenter registerForMessageName:@"PreferencesDidChangeNotification" target:self selector:@selector(preferencesUpdated:withUserInfo:)];
+
+    });
 	}
 	SBDockView *orig = %orig;
 	return orig;
+}
+
+%new()
+-(void)preferencesUpdated:(id)notification withUserInfo:(NSDictionary *)info {
+		NSLog(@"changed");
+    NSString *name = [NSString stringWithFormat:@"%@",info[@"name"]];
+
+		if ([ConfigurationManager.sharedManager isEnabled]) {
+ 				if ([name isEqualToString:@"Show Search First"]) {
+						id value = info[@"value"];
+            [[ConfigurationManager.sharedManager configuration] setObject: value forKey:@"showSearchFirst"];
+
+						SBIconController *cont = [%c(SBIconController) sharedInstance];
+						SBHLibraryViewController *library = cont.libraryViewController;
+						SBHLibrarySearchController *search = library.containerViewController;
+
+						if ([ConfigurationManager.sharedManager showSearchFirst]) {
+							[search _performPresentation: YES];
+						} else {
+							[search _dismissPresentation: YES];
+						}
+        }
+		}
 }
 
 -(void)setBackgroundView:(UIView *)view {
@@ -178,7 +213,7 @@ static dispatch_once_t onceToken;
 		if (self.frame.origin.y > 0) {
 
 			SBIconController *cont = [%c(SBIconController) sharedInstance];
-			SBHLibraryViewController *library = cont.libraryViewController;
+			SBHLibraryViewController *library = cont.libraryViewController;	
 			UIView *libraryView = library.view;
 
 			dispatch_once(&onceToken, ^{
@@ -236,10 +271,11 @@ static dispatch_once_t onceToken;
 
 %ctor {
 	NSLog(@"Loading Vinculum 2 (1.0.0)");
-	BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:@"/var/mobile/Library/Preferences/com.irepo.slock.plist"];
+	BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:PLIST_PATH];
 
 	if (!fileExists) {
-		NSMutableDictionary *tempDict = [[NSMutableDictionary alloc] initWithDictionary:@{ @"enabled" : [NSNumber numberWithBool:YES] }];
-		[tempDict writeToFile:@"/var/mobile/Library/Preferences/com.irepo.slock.plist" atomically:YES];
+		NSMutableDictionary *tempDict = [[NSMutableDictionary alloc] initWithDictionary:@{ @"enabled" : [NSNumber numberWithBool:YES],
+																																											 @"showSearchFirst": [NSNumber numberWithBool: NO] }];
+		[tempDict writeToFile:PLIST_PATH atomically:YES];
 	}
 }

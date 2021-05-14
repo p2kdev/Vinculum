@@ -44,6 +44,11 @@
   return [[_configuration objectForKey:@"enabled"] boolValue];
 }
 
+-(BOOL)showSearchFirst {
+  BOOL enabled = [[_configuration objectForKey:@"showSearchFirst"] boolValue];
+  return [self isEnabled] && enabled;
+}
+
 -(void)sync {
   CFStringRef appID = CFSTR(PLIST_VALUE);
   CFPreferencesSynchronize(appID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
