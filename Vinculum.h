@@ -31,20 +31,47 @@
 -(void)close;
 @end
 
+@interface SBRootFolderController: NSObject
+-(long long)trailingCustomViewPageIndex;
+@end
+
+@interface SBNestingViewController : UIViewController
+@end
+
 @interface SBHIconLibraryTableViewController: UITableViewController
 @end
 
-@interface SBHLibraryViewController: UIViewController 
+@interface SBHLibraryViewController: SBNestingViewController 
 @property (nonatomic,readonly) SBHIconLibraryTableViewController *iconTableViewController; 
 -(UIScrollView *)contentScrollView;
+-(void)addObserver:(id)arg1 ;
 @end
 
 @interface SBHIconManager 
 @property (nonatomic,retain) SBHLibraryViewController *overlayLibraryViewController;
+-(void)setOccludedByOverlay:(BOOL)arg1 ;
 @end
 
-@interface SBIconController
+@protocol SBHLibraryViewControllerObserver
+@end
+ 
+@interface SBHomeScreenOverlayController: UIViewController
+@end
+
+@interface SBIconController: NSObject 
+@property (nonatomic,retain) SBHomeScreenOverlayController * homeScreenOverlayController;
+@property (getter=_rootFolderController,nonatomic,readonly) SBRootFolderController * rootFolderController; 
 @property (nonatomic,retain) SBHLibraryViewController *storedLibraryController;
+@property (nonatomic,retain) UIView *storedLibraryView;
+
 +(SBIconController *)sharedInstance; 
 -(SBHLibraryViewController *)libraryViewController;
+-(void)setLibraryViewController:(SBHLibraryViewController *)arg1 ;
+@end
+
+@interface SBHRootSidebarController
+@property (nonatomic,retain) UIViewController * avocadoViewController;
+@end
+
+@interface SBIconScrollView: UIScrollView
 @end

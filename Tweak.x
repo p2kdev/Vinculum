@@ -9,6 +9,32 @@ static dispatch_once_t onceToken;
 
 %end
 
+%hook SBIconController 
+-(void)iconManager:(id)arg1 rootFolderController:(id)arg2 didOverscrollOnLastPageByAmount:(double)arg3 {
+	self.homeScreenOverlayController = nil;
+}
+// -(void)setHomeScreenOverlayController:(SBHomeScreenOverlayController *)arg1 {
+// 	NSLog(@"home %@", arg1);
+// 	%orig(nil);
+// }
+
+%end
+
+//prevents embedding of the SBHLibaryViewController 
+%hook SBHRootSidebarController
+
+-(void)_configureAvocadoViewController {
+	if (![ConfigurationManager.sharedManager isEnabled]) {
+		%orig;
+	}
+
+	if (![self.avocadoViewController isKindOfClass: %c(SBHLibraryViewController)]) {
+		%orig;
+	}
+}
+
+%end
+
 %hook SBHLibraryViewController 
 -(void)iconTapped:(id)arg1 {
 	if (![arg1 isKindOfClass: %c(SBHLibraryCategoryPodIconView)]) {
@@ -19,17 +45,6 @@ static dispatch_once_t onceToken;
 	%orig;
 }
 
-%end
-
-%hook SBIconController 
-// -(BOOL)isAppLibraryAllowed {
-//     BOOL enabled = [[ConfigurationManager sharedManager] isEnabled];
-
-//     if (enabled) {
-//         return NO;
-//     }
-//     return %orig;
-// }
 %end
 
 %hook SBDockView
@@ -140,13 +155,14 @@ static dispatch_once_t onceToken;
 
 			dispatch_once(&onceToken, ^{
 				%orig;
+
 				self.originalFrame = self.frame;
 				self.originalBackgroundFrame = self.backgroundView.frame;
 				self.originalLibraryFrame = libraryView.frame;
 				self.appLibrary = libraryView;
 				self.appLibrary.alpha = 0.0;
 				self.appLibrary.hidden = YES;
-				
+
 				UIEdgeInsets original = library.contentScrollView.contentInset;
 				library.contentScrollView.contentInset = UIEdgeInsetsMake(original.top, 
 																																	original.left, 
