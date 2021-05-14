@@ -29,6 +29,7 @@
 //new
 -(void)close;
 -(void)open;
+-(CGFloat)heightToOpen;
 @end
 
 @interface SBRootFolderController: NSObject
@@ -44,6 +45,7 @@
 @interface SBHLibrarySearchController: UIViewController 
 -(void)_performPresentation:(BOOL)arg1 ;
 -(void)_dismissPresentation:(BOOL)arg1 ;
+
 @end
 
 @interface SBHLibraryViewController: SBNestingViewController 

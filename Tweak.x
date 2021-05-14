@@ -9,18 +9,6 @@ static dispatch_once_t onceToken;
 
 %end
 
-%hook SBUIController
--(void)restoreContentAndUnscatterIconsAnimated:(BOOL)arg1 {
-		NSLog(@"block before");
-
-    // void (^newBlock)(void) = ^{
-		// 	NSLog(@"block");
-		// 	arg2();
-    // };
-		%orig;
-}
-%end
-
 %hook SBIconController 
 -(void)iconManager:(id)arg1 rootFolderController:(id)arg2 didOverscrollOnLastPageByAmount:(double)arg3 {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
@@ -116,12 +104,16 @@ static dispatch_once_t onceToken;
 														self.frame.size.height);
 	}
 }
+%new()
+-(CGFloat)heightToOpen {
+	 return [Status isiPhoneX] ? self.originalFrame.size.height / 2 : 20;
+}
 
 %new() 
 -(void)open {
 	[UIView animateWithDuration:0.3f animations:^(void) {
 		self.frame = CGRectMake(self.originalFrame.origin.x,
-														self.originalFrame.size.height / 2,
+														self.heightToOpen,
 														self.originalFrame.size.width,
 														self.frame.size.height);
 	} completion: ^(BOOL complete) {
@@ -140,7 +132,7 @@ static dispatch_once_t onceToken;
 
 -(void)setFrame:(CGRect)frame {
 	if ([ConfigurationManager.sharedManager isEnabled]) {
-		self.appLibrary.alpha = ((self.originalFrame.size.height / 2.0f) / frame.origin.y);
+		self.appLibrary.alpha = (self.heightToOpen / frame.origin.y);
 		self.dockListView.alpha = 1 - self.appLibrary.alpha;
 		[self.appLibrary endEditing: YES];
 	}
